@@ -1,9 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Photon.Pun;
-using UnityEngine.InputSystem;
+using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
+using UnityEngine.InputSystem;
 
 
 public class Aim : MonoBehaviour
@@ -25,7 +24,7 @@ public class Aim : MonoBehaviour
         inputs = new PlayerInputs();
         controller = GetComponent<CharacterController>();
         pv = GetComponentInParent<PhotonView>();
-         
+
     }
     private void OnEnable()
     {
@@ -41,11 +40,11 @@ public class Aim : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, range);
     }
-    
+
     public void SetTargetSelected(bool isTarget)
     {
         targetCylinder.SetActive(isTarget);
-         
+
     }
 
     void Calculate()
@@ -54,7 +53,7 @@ public class Aim : MonoBehaviour
         allTargets.Clear();
 
         RaycastHit[] hits = Physics.SphereCastAll(transform.position, range, transform.position, range);
-        foreach(RaycastHit hit in hits )
+        foreach (RaycastHit hit in hits)
         {
             GameObject temp = hit.transform.gameObject;
             if (temp.GetComponent<CharacterController>() && !temp.GetComponentInParent<PhotonView>().IsMine)
@@ -67,25 +66,26 @@ public class Aim : MonoBehaviour
 
     void SelectedTarget()
     {
-        if(controller.velocity == Vector3.zero)
+        if (controller.velocity == Vector3.zero)
         {
             if (canSearch) InvokeRepeating(nameof(Calculate), 0, 0.5f);
-            else
-            {
-                if(targetObj != null)
-                {
-                    targetObj.GetComponent<Aim>().SetTargetSelected(false);
-                    targetObj = null;
-                }
-                canSearch = true;
-                CancelInvoke();
-            }
         }
+        else
+        {
+            if (targetObj != null)
+            {
+                targetObj.GetComponent<Aim>().SetTargetSelected(false);
+                targetObj = null;
+            }
+            canSearch = true;
+            CancelInvoke();
+        }
+        
     }
 
     void SelectNewTarget()
     {
-        foreach(GameObject obj  in allTargets)
+        foreach (GameObject obj in allTargets)
         {
             obj.GetComponent<Aim>().SetTargetSelected(false);
         }
@@ -99,6 +99,7 @@ public class Aim : MonoBehaviour
     }
     void SelectNewTarget(InputAction.CallbackContext context)
     {
+        targetCount++;
         foreach (GameObject obj in allTargets)
         {
             obj.GetComponent<Aim>().SetTargetSelected(false);
@@ -123,20 +124,17 @@ public class Aim : MonoBehaviour
     {
         if (!pv.IsMine) return;
         SelectedTarget();
-            
     }
 
     void OnFire(InputAction.CallbackContext context)
     {
-        if(targetObj != null)
+        if (targetObj != null)
         {
-            Vector3 dir = (targetObj.transform.position = transform.position).normalized;
+            Vector3 dir = (targetObj.transform.position - transform.position).normalized;
 
-            GameObject temp = PhotonNetwork.Instantiate(Path.Combine("Fireball"),spawnPosition.position,Quaternion.identity);
+            GameObject temp = PhotonNetwork.Instantiate(Path.Combine("Fireball"), spawnPosition.position, Quaternion.identity);
             Physics.IgnoreCollision(temp.GetComponent<Collider>(), GetComponent<Collider>());
             temp.GetComponent<Bullet>().StartMove(dir);
-          
-            
         }
     }
 }

@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Photon.Realtime;
 using Photon.Pun;
+using Photon.Realtime;
 using TMPro;
+using UnityEngine;
 
 public class LobbyNetworkManager : MonoBehaviourPunCallbacks
 {
@@ -34,13 +32,12 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
     public void ToBattleButton()
     {
         WindowsManager.Layout.OpenLayout("Auto_battle");
-        WindowsManager.Layout.OpenLayout("Auto_battle");
         PhotonNetwork.JoinRandomRoom();
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        if(returnCode == (short)ErrorCode.NoRandomMatchFound)
+        if (returnCode == (short)ErrorCode.NoRandomMatchFound)
         {
             waitBattletext.text = "Tu nikomu ne nushen";
             CreateNewRoom();
@@ -52,15 +49,15 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
         RoomOptions currentRoom = new RoomOptions();
         currentRoom.IsOpen = true;
         currentRoom.MaxPlayers = 2;
-        PhotonNetwork .CreateRoom(RoomNameGenerator(), currentRoom);
-           
+        PhotonNetwork.CreateRoom(RoomNameGenerator(), currentRoom);
+
     }
 
     string RoomNameGenerator()
     {
         string roomCode = null;
         short codeLength = 12;
-        for(int i = 0; 1 < codeLength; i++)
+        for (int i = 0; i < codeLength; i++)
         {
             char symbol = (char)Random.Range(65, 91);
             roomCode += symbol;
@@ -70,9 +67,9 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
 
     public override void OnCreateRoomFailed(short returnCode, string message)
     {
-        if(returnCode == (short)ErrorCode.GameIdAlreadyExists)
+        if (returnCode == (short)ErrorCode.GameIdAlreadyExists)
         {
-            CreateNewRoom() ;
+            CreateNewRoom();
         }
     }
 
@@ -84,13 +81,13 @@ public class LobbyNetworkManager : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         PhotonNetwork.AutomaticallySyncScene = true;
-        if(PhotonNetwork.IsMasterClient) return;
+        if (PhotonNetwork.IsMasterClient) return;
         waitBattletext.text = "Chas budet mahach, prigotovsya";
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        if(!PhotonNetwork.IsMasterClient) return ;
+        if (!PhotonNetwork.IsMasterClient) return;
         Room currentRoom = PhotonNetwork.CurrentRoom;
         currentRoom.IsOpen = false;
 

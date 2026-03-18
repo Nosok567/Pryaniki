@@ -19,7 +19,7 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (pv.IsMine) return;
+        if (!pv.IsMine) return;
         if (other.gameObject.CompareTag("Player"))
         { 
             other.GetComponentInParent<PLayerSettings>().TakeDamage(info.damage);
